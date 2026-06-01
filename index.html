@@ -610,22 +610,8 @@ function applyFilter() {
   let rows = allData;
 
 if (date) {
-    rows = rows.filter(r => {
-      const d = String(r["Ngày"] || '');
-      // support "YYYY-MM-DD", "DD/MM/YYYY", "MM/DD/YYYY"
-      if (d.includes('-')) return d.startsWith(date);
-      if (d.includes('/')) {
-        const p = d.split('/');
-        if (p.length === 3) {
-          if (p[2].length === 4) { // DD/MM/YYYY
-            const iso = `${p[2]}-${p[1].padStart(2,'0')}-${p[0].padStart(2,'0')}`;
-            return iso === date;
-          }
-        }
-      }
-      return d.startsWith(date);
-    });
-  }
+  rows = rows.filter(r => r["Ngày"] === date);
+}
   console.log("After date:", rows.length);
  
 
