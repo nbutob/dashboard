@@ -508,8 +508,8 @@
    CẤU HÌNH – đổi mật khẩu tại đây
    ══════════════════════════════════════ */
 const APP_PASSWORD = "a";  // ← đổi mật khẩu ở đây
-const WEBAPP_URL   = "https://script.google.com/macros/s/AKfycbzF1G_Am0kkfquBn66IeD6Q49TbkOogO6WMUzFmpJYLZ2rRNZvP1pmc8V7hzELoAW35/exec";  // ← dán Google Apps Script URL vào đây
-const SHEET_TAB    = "Nangsuat";            // ← tên tab trong Google Sheets
+const WEBAPP_URL   = "ĐIỀN_URL_VÀO_ĐÂY";  // ← dán Google Apps Script URL vào đây
+const SHEET_TAB    = "NangSuat";            // ← tên tab trong Google Sheets
 
 /* ══════════════════════════════════════
    State
@@ -539,6 +539,7 @@ function doLogout() {
   document.getElementById('loginScreen').style.display = 'flex';
   document.getElementById('pwInput').value = '';
   document.getElementById('loginErr').textContent = '';
+  allData = [];
 }
 
 /* ══════════════════════════════════════
