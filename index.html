@@ -600,13 +600,16 @@ async function fetchData() {
    Filter & search
    ══════════════════════════════════════ */
 function applyFilter() {
-  const date   = document.getElementById('filterDate').value;         // "YYYY-MM-DD"
+  const date   = "";         // "YYYY-MM-DD"
   const chuyen = document.getElementById('filterChuyen').value;
   const search = document.getElementById('searchInput').value.toLowerCase().trim();
+  console.log("Date:", date);
+  console.log("Chuyen:", chuyen);
+  console.log("Before:", allData.length);
 
   let rows = allData;
 
-  if (date) {
+if (date) {
     rows = rows.filter(r => {
       const d = String(r["Ngày"] || '');
       // support "YYYY-MM-DD", "DD/MM/YYYY", "MM/DD/YYYY"
@@ -623,6 +626,8 @@ function applyFilter() {
       return d.startsWith(date);
     });
   }
+  console.log("After date:", rows.length);
+ 
 
 if (chuyen) {
   rows = rows.filter(r =>
@@ -630,6 +635,7 @@ if (chuyen) {
     chuyen.trim().toLowerCase()
   );
 }
+  console.log("After chuyen:", rows.length);
 
   if (search) {
   rows = rows.filter(r => {
@@ -671,7 +677,9 @@ function initials(name) {
    Summary cards
    ══════════════════════════════════════ */
 function renderSummary(rows) {
-  const vals = rows.map(r => parseFloat(getF(r, ['nangSuat','NangSuat','Năng suất','nang_suat','ns','NS'])) || 0);
+  const vals = rows.map(r =>
+  parseFloat(r["Năng suất (sp/ngày)"]) || 0
+);
   const total = rows.length;
   const avg  = total ? Math.round(vals.reduce((a,b)=>a+b,0) / total) : 0;
   const max  = total ? Math.max(...vals) : 0;
