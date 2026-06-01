@@ -428,6 +428,11 @@
           <option>Chuyền 3</option>
           <option>Chuyền 4</option>
           <option>Chuyền 5</option>
+          <option>1</option>
+          <option>2</option>
+          <option>3</option>
+          <option>4</option>
+          <option>5</option>
         </select>
       </div>
       <button class="btn btn-outline" onclick="clearFilter()">✕ Xoá lọc</button>
@@ -586,15 +591,7 @@ async function fetchData() {
     allData = rows;
     const now = new Date().toLocaleTimeString('vi-VN');
     document.getElementById('lastSyncLabel').textContent = 'Cập nhật lúc ' + now;
-    if (rows.length > 0) {
-      const r0 = rows[0];
-      const keys = Object.keys(r0);
-      const debugMsg = '🔍 Tên cột: ' + keys.join(' | ') + ' — Ngày row[0]: ' + JSON.stringify(r0[keys.find(k=>k.toLowerCase().includes('ng'))]);
-      showStatus(debugMsg, 'info');
-      console.log('DEBUG all rows:', JSON.stringify(rows.slice(0,3)));
-    } else {
-      showStatus('Đã tải 0 bản ghi.', 'ok');
-    }
+    showStatus(`Đã tải ${rows.length} bản ghi thành công.`, 'ok');
     applyFilter();
 
   } catch (err) {
@@ -650,18 +647,18 @@ function applyFilter() {
 
   if (date) {
     rows = rows.filter(r => {
-      const raw = getF(r, ['ngay','Ngay','Ngày','Ngay lam','Ngày làm','date','Date','ngayLam']);
+      const raw = getF(r, ['Ngày','ngay','Ngay','Ngay lam','Ngày làm','date','Date','ngayLam']);
       return toISO(raw) === date;
     });
   }
 
   if (chuyen) {
-    rows = rows.filter(r => normalize(getF(r, ['chuyen','Chuyen','Chuyền','chuyen_so','Bộ phận / Chuyền','Bo phan'])) === normalize(chuyen));
+    rows = rows.filter(r => normalize(getF(r, ['Bộ phận','Bo phan','chuyen','Chuyen','Chuyền','chuyen_so','Bộ phận / Chuyền'])) === normalize(chuyen));
   }
 
   if (search) {
     rows = rows.filter(r => {
-      const name = getF(r, ['ten','Ten','Họ tên','ho_ten','HoTen','Họ và tên','name']) || '';
+      const name = getF(r, ['Họ và tên','ten','Ten','Họ tên','ho_ten','HoTen','name']) || '';
       return name.toLowerCase().includes(search);
     });
   }
@@ -711,7 +708,7 @@ function initials(name) {
    Summary cards
    ══════════════════════════════════════ */
 function renderSummary(rows) {
-  const vals = rows.map(r => parseFloat(getF(r, ['nangSuat','NangSuat','Năng suất','nang_suat','ns','NS'])) || 0);
+  const vals = rows.map(r => parseFloat(getF(r, ['Năng suất (sp/ngày)','nangSuat','NangSuat','Năng suất','nang_suat','ns','NS'])) || 0);
   const total = rows.length;
   const avg  = total ? Math.round(vals.reduce((a,b)=>a+b,0) / total) : 0;
   const max  = total ? Math.max(...vals) : 0;
@@ -755,13 +752,13 @@ function renderTable(rows) {
 
   let html = '';
   sorted.forEach((r, i) => {
-    const ten     = getF(r, ['ten','Ten','Họ tên','ho_ten','HoTen']) || '—';
-    const chuyen  = getF(r, ['chuyen','Chuyen','Chuyền','chuyen_so']) || '—';
-    const maHang  = getF(r, ['maHang','MaHang','Mã hàng','ma_hang','maDonHang','ma_don','maHang','mahang']) || '—';
-    const congDoan= getF(r, ['congDoan','CongDoan','Công đoạn','cong_doan','so_cong_doan']) || '—';
-    const nsRaw   = getF(r, ['nangSuat','NangSuat','Năng suất','nang_suat','ns','NS']);
+    const ten     = getF(r, ['Họ và tên','ten','Ten','Họ tên','ho_ten','HoTen']) || '—';
+    const chuyen  = getF(r, ['Bộ phận','Bo phan','chuyen','Chuyen','Chuyền','chuyen_so']) || '—';
+    const maHang  = getF(r, ['Mã hàng','maHang','MaHang','ma_hang','maDonHang','mahang']) || '—';
+    const congDoan= getF(r, ['Số công đoạn','congDoan','CongDoan','Công đoạn','cong_doan','so_cong_doan']) || '—';
+    const nsRaw   = getF(r, ['Năng suất (sp/ngày)','nangSuat','NangSuat','Năng suất','nang_suat','ns','NS']);
     const ns      = parseFloat(nsRaw) || 0;
-    const ngay    = getF(r, ['ngay','Ngay','Ngày','date','Date']) || '—';
+    const ngay    = getF(r, ['Ngày','ngay','Ngay','date','Date']) || '—';
 
     const colorKey = normalize(chuyen);
     const badgeClass = chuyenColors[colorKey] !== undefined ? chuyenColors[colorKey] : '';
