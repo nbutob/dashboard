@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="theme-color" content="#0f4c35" />
+<title>Dashboard Tổ Trưởng – Năng Suất</title>
+<style>
+  /* ── Reset & base ── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { font-size: 16px; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #f0f2f0;
+    color: #1a1a1a;
+    min-height: 100vh;
+  }
+
+  /* ── Login ── */
+  #loginScreen {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(160deg, #0f4c35 0%, #1a7a55 100%);
+    padding: 1.5rem;
+  }
+  .login-box {
+    background: #fff;
+    border-radius: 16px;
+    padding: 2.5rem 2rem;
+    width: 100%;
+    max-width: 380px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.18);
+  }
+  .login-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 2rem;
+  }
+  .brand-icon {
+    width: 48px; height: 48px;
+    background: #0f4c35;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    color: #fff;
+    flex-shrink: 0;
+  }
+  .brand-text h1 { font-size: 17px; font-weight: 700; color: #0f4c35; }
+  .brand-text p  { font-size: 13px; color: #888; margin-top: 2px; }
+
+  .form-group { margin-bottom: 1rem; }
+  .form-group label { display: block; font-size: 13px; font-weight: 600; color: #555; margin-bottom: 6px; }
+  .form-group input {
+    width: 100%; height: 44px; padding: 0 14px;
+    border: 1.5px solid #e0e0e0;
+    border-radius: 10px;
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.15s;
+    background: #fafafa;
+  }
+  .form-group input:focus { border-color: #0f4c35; background: #fff; }
+
+  .btn-login {
+    width: 100%; height: 46px;
+    background: #0f4c35;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    margin-top: 0.5rem;
+    transition: opacity 0.15s, transform 0.1s;
+  }
+  .btn-login:hover { opacity: 0.9; }
+  .btn-login:active { transform: scale(0.98); }
+  .login-err {
+    font-size: 13px;
+    color: #d32f2f;
+    text-align: center;
+    margin-top: 10px;
+    min-height: 20px;
+  }
+
+  /* ── App shell ── */
+  #appScreen { display: none; min-height: 100vh; }
+
+  /* ── Top bar ── */
+  .topbar {
+    position: sticky; top: 0; z-index: 100;
+    background: #0f4c35;
+    color: #fff;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1.25rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  }
+  .topbar-left { display: flex; align-items: center; gap: 10px; }
+  .topbar-icon {
+    width: 34px; height: 34px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+  }
+  .topbar-title { font-size: 15px; font-weight: 700; }
+  .topbar-sub   { font-size: 11px; opacity: 0.7; }
+  .btn-logout {
+    background: rgba(255,255,255,0.15);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: 13px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: background 0.15s;
+  }
+  .btn-logout:hover { background: rgba(255,255,255,0.25); }
+
+  /* ── Main content ── */
+  .main { max-width: 860px; margin: 0 auto; padding: 1.25rem; }
+
+
+  /* ── Buttons ── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    height: 38px;
+    padding: 0 14px;
+    border-radius: 9px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: opacity 0.15s, transform 0.1s;
+  }
+  .btn:active { transform: scale(0.97); }
+  .btn-green  { background: #0f4c35; color: #fff; }
+  .btn-green:hover  { opacity: 0.88; }
+  .btn-outline {
+    background: transparent;
+    border: 1.5px solid #d0d0d0;
+    color: #555;
+  }
+  .btn-outline:hover { border-color: #0f4c35; color: #0f4c35; }
+
+  /* ── Status alert ── */
+  .status-alert {
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 1rem;
+    display: none;
+    align-items: center;
+    gap: 8px;
+  }
+  .status-alert.ok     { background: #e8f5e9; color: #1b5e20; border: 1px solid #a5d6a7; }
+  .status-alert.error  { background: #ffebee; color: #b71c1c; border: 1px solid #ef9a9a; }
+  .status-alert.info   { background: #e3f2fd; color: #0d47a1; border: 1px solid #90caf9; }
+  .status-alert.active { display: flex; }
+
+  /* ── Filter bar ── */
+  .filter-bar {
+    background: #fff;
+    border-radius: 14px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.25rem;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 12px;
+  }
+  .filter-field { display: flex; flex-direction: column; gap: 5px; }
+  .filter-field label { font-size: 12px; font-weight: 700; color: #888; }
+  .filter-field input[type="date"],
+  .filter-field select {
+    height: 38px;
+    padding: 0 11px;
+    border: 1.5px solid #e4e4e4;
+    border-radius: 9px;
+    font-size: 13px;
+    background: #fff;
+    outline: none;
+    transition: border-color 0.15s;
+    color: #1a1a1a;
+    min-width: 140px;
+  }
+  .filter-field input[type="date"]:focus,
+  .filter-field select:focus { border-color: #0f4c35; }
+
+  /* ── Summary cards ── */
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 10px;
+    margin-bottom: 1.25rem;
+  }
+  .summary-card {
+    background: #fff;
+    border-radius: 14px;
+    padding: 1.1rem 1rem;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    text-align: center;
+    border-top: 3px solid #0f4c35;
+  }
+  .summary-card.amber { border-top-color: #e67e22; }
+  .summary-card.blue  { border-top-color: #1976d2; }
+  .summary-card.red   { border-top-color: #e53935; }
+  .s-val  { font-size: 26px; font-weight: 800; color: #0f4c35; line-height: 1; }
+  .amber .s-val { color: #e67e22; }
+  .blue  .s-val { color: #1976d2; }
+  .red   .s-val { color: #e53935; }
+  .s-lbl { font-size: 12px; color: #888; margin-top: 5px; }
+  .s-sub { font-size: 11px; color: #bbb; margin-top: 2px; }
+
+  /* ── Workers table ── */
+  .table-card {
+    background: #fff;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    margin-bottom: 1.5rem;
+  }
+  .table-head {
+    padding: 1rem 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    border-bottom: 1.5px solid #f0f0f0;
+  }
+  .table-head-title { font-size: 15px; font-weight: 700; color: #1a1a1a; }
+  .table-head-count { font-size: 13px; color: #888; }
+
+  /* Search inside table */
+  .tbl-search {
+    height: 34px; padding: 0 11px;
+    border: 1.5px solid #e4e4e4;
+    border-radius: 9px;
+    font-size: 13px;
+    outline: none;
+    width: 180px;
+    transition: border-color 0.15s;
+  }
+  .tbl-search:focus { border-color: #0f4c35; }
+
+  /* Scrollable table wrapper */
+  .table-scroll { overflow-x: auto; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+  }
+  thead tr { background: #f7f9f7; }
+  th {
+    padding: 10px 14px;
+    text-align: left;
+    font-size: 11.5px;
+    font-weight: 700;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+    border-bottom: 1.5px solid #ebebeb;
+  }
+  th.num, td.num { text-align: right; }
+  td {
+    padding: 10px 14px;
+    color: #1a1a1a;
+    border-bottom: 1px solid #f2f2f2;
+    vertical-align: middle;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #f9fbf9; }
+
+  /* Avatar */
+  .avatar {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    background: #0f4c35;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-right: 8px;
+  }
+  .cell-name { display: flex; align-items: center; white-space: nowrap; }
+
+  /* Chuyền badge */
+  .badge-chuyen {
+    display: inline-block;
+    padding: 2px 9px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    background: #e8f5e9;
+    color: #1b5e20;
+  }
+  .badge-chuyen.c2 { background: #e3f2fd; color: #0d47a1; }
+  .badge-chuyen.c3 { background: #fff3e0; color: #e65100; }
+  .badge-chuyen.c4 { background: #fce4ec; color: #880e4f; }
+  .badge-chuyen.c5 { background: #f3e5f5; color: #4a148c; }
+
+  /* NS pill */
+  .ns-pill {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 700;
+  }
+  .ns-high   { background: #e8f5e9; color: #1b5e20; }
+  .ns-mid    { background: #fff8e1; color: #e65100; }
+  .ns-low    { background: #ffebee; color: #b71c1c; }
+  .ns-none   { background: #f5f5f5; color: #aaa; }
+
+  /* ── Empty / loading states ── */
+  .state-box {
+    padding: 3rem 1rem;
+    text-align: center;
+    color: #bbb;
+    font-size: 14px;
+  }
+  .state-box .state-icon { font-size: 38px; margin-bottom: 10px; }
+
+  /* ── Spinner ── */
+  .spinner {
+    display: inline-block;
+    width: 18px; height: 18px;
+    border: 2.5px solid rgba(255,255,255,0.4);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    vertical-align: middle;
+    margin-right: 4px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── Footer ── */
+  .footer {
+    text-align: center;
+    font-size: 12px;
+    color: #bbb;
+    padding: 1rem;
+    margin-top: 0.5rem;
+  }
+
+  /* ── Responsive ── */
+  @media(max-width:600px) {
+    .main { padding: 1rem 0.85rem; }
+    .filter-bar { gap: 8px; }
+    .tbl-search { width: 130px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════ LOGIN ══════════════ -->
+
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-brand">
+      <div class="brand-icon">📊</div>
+      <div class="brand-text">
+        <h1>Dashboard Tổ Trưởng</h1>
+        <p>Xưởng may – Theo dõi năng suất</p>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="pwInput">Mật khẩu</label>
+      <input type="password" id="pwInput" placeholder="Nhập mật khẩu..." autocomplete="current-password" />
+    </div>
+    <button class="btn-login" onclick="doLogin()">Đăng nhập</button>
+    <div class="login-err" id="loginErr"></div>
+  </div>
+</div>
+
+
+<!-- ══════════════ APP ══════════════ -->
+<div id="appScreen">
+
+  <!-- Top bar -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-icon">📊</div>
+      <div>
+        <div class="topbar-title">Dashboard Năng Suất</div>
+        <div class="topbar-sub" id="lastSyncLabel">Chưa đồng bộ</div>
+      </div>
+    </div>
+    <button class="btn-logout" onclick="doLogout()">⬅ Thoát</button>
+  </div>
+
+  <div class="main">
+
+    <!-- Status alert -->
+    <div class="status-alert" id="statusAlert"></div>
+
+    <!-- Filter bar -->
+    <div class="filter-bar">
+      <div class="filter-field">
+        <label>📅 Chọn ngày</label>
+        <input type="date" id="filterDate" onchange="applyFilter()" />
+      </div>
+      <div class="filter-field">
+        <label>🏭 Chuyền</label>
+        <select id="filterChuyen" onchange="applyFilter()">
+          <option value="">Tất cả chuyền</option>
+          <option>Chuyền 1</option>
+          <option>Chuyền 2</option>
+          <option>Chuyền 3</option>
+          <option>Chuyền 4</option>
+          <option>Chuyền 5</option>
+        </select>
+      </div>
+      <button class="btn btn-outline" onclick="clearFilter()">✕ Xoá lọc</button>
+    </div>
+
+    <!-- Summary cards -->
+    <div class="summary-grid">
+      <div class="summary-card">
+        <div class="s-val" id="sTotal">—</div>
+        <div class="s-lbl">Tổng công nhân</div>
+        <div class="s-sub">bản ghi trong ngày</div>
+      </div>
+      <div class="summary-card amber">
+        <div class="s-val" id="sAvg">—</div>
+        <div class="s-lbl">NS trung bình</div>
+        <div class="s-sub">sp / ngày</div>
+      </div>
+      <div class="summary-card blue">
+        <div class="s-val" id="sMax">—</div>
+        <div class="s-lbl">NS cao nhất</div>
+        <div class="s-sub">sp / ngày</div>
+      </div>
+      <div class="summary-card red">
+        <div class="s-val" id="sMin">—</div>
+        <div class="s-lbl">NS thấp nhất</div>
+        <div class="s-sub">sp / ngày</div>
+      </div>
+    </div>
+
+    <!-- Workers table -->
+    <div class="table-card">
+      <div class="table-head">
+        <div>
+          <div class="table-head-title">Danh sách công nhân</div>
+          <div class="table-head-count" id="rowCountLabel">0 bản ghi</div>
+        </div>
+        <input class="tbl-search" type="text" id="searchInput" placeholder="🔍 Tìm tên..." oninput="applyFilter()" />
+      </div>
+      <div class="table-scroll">
+        <table id="mainTable">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Họ và tên</th>
+              <th>Chuyền</th>
+              <th>Mã hàng</th>
+              <th class="num">Số công đoạn</th>
+              <th class="num">Năng suất (sp/ng)</th>
+              <th>Ngày làm</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+            <tr>
+              <td colspan="7">
+                <div class="state-box">
+                  <div class="state-icon">📋</div>
+                  Đăng nhập để xem dữ liệu
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="footer">Dashboard Tổ Trưởng · Lộc Nguyên Garment · v1.0</div>
+  </div>
+</div>
+
+<script>
+/* ══════════════════════════════════════
+   CẤU HÌNH – đổi mật khẩu tại đây
+   ══════════════════════════════════════ */
+const APP_PASSWORD = "locnguyentotruong";  // ← đổi mật khẩu ở đây*/
+const WEBAPP_URL   = "https://script.google.com/macros/s/AKfycbyjOVGd6Smud2svLr5bAu7ZxlsmQ5tyrt6Z4O5xlm48906x9It2QDo_Hvy6598UVXYp/exec";  // ← dán Google Apps Script URL vào đây
+const SHEET_TAB    = "Nangsuat";            // ← tên tab trong Google Sheets
+
+/* ══════════════════════════════════════
+   State
+   ══════════════════════════════════════ */
+let allData = [];  // raw rows from Sheets
+
+/* ══════════════════════════════════════
+   Login / Logout
+   ══════════════════════════════════════ */
+function doLogin() {
+  const val = document.getElementById('pwInput').value;
+  if (val === APP_PASSWORD) {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('appScreen').style.display = 'block';
+    setDefaultDate();
+    fetchData();
+  } else {
+    document.getElementById('loginErr').textContent = '❌ Sai mật khẩu, vui lòng thử lại.';
+    document.getElementById('pwInput').value = '';
+    document.getElementById('pwInput').focus();
+  }
+}
+document.getElementById('pwInput').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+
+function doLogout() {
+  document.getElementById('appScreen').style.display = 'none';
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('pwInput').value = '';
+  document.getElementById('loginErr').textContent = '';
+}
+
+/* ══════════════════════════════════════
+   Status helper
+   ══════════════════════════════════════ */
+function showStatus(msg, type /* ok | error | info */) {
+  const el = document.getElementById('statusAlert');
+  const icons = { ok: '✅', error: '❌', info: 'ℹ️' };
+  el.className = 'status-alert active ' + type;
+  el.textContent = (icons[type] || '') + ' ' + msg;
+  if (type === 'ok') setTimeout(() => el.classList.remove('active'), 4000);
+}
+
+/* ══════════════════════════════════════
+   Default date = today (Vietnam)
+   ══════════════════════════════════════ */
+function setDefaultDate() {
+  const now = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Ho_Chi_Minh' }));
+  const yyyy = now.getFullYear();
+  const mm   = String(now.getMonth() + 1).padStart(2, '0');
+  const dd   = String(now.getDate()).padStart(2, '0');
+  document.getElementById('filterDate').value = `${yyyy}-${mm}-${dd}`;
+}
+
+/* ══════════════════════════════════════
+   Fetch data from Google Apps Script
+   ══════════════════════════════════════ */
+async function fetchData() {
+  const url = WEBAPP_URL;
+  const tab = SHEET_TAB;
+
+  if (!url || url === 'ĐIỀN_URL_VÀO_ĐÂY') {
+    showStatus('Chưa có dữ liệu. Liên hệ quản lý để được hỗ trợ.', 'error');
+    return;
+  }
+
+  setTableLoading();
+  showStatus('Đang tải dữ liệu từ Google Sheets...', 'info');
+
+  try {
+    const res  = await fetch(`${url}?action=getData&sheet=${encodeURIComponent(tab)}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const json = await res.json();
+
+    let rows = [];
+    if (Array.isArray(json))          rows = json;
+    else if (Array.isArray(json.data)) rows = json.data;
+    else throw new Error('Định dạng dữ liệu không đúng');
+
+    allData = rows;
+    const now = new Date().toLocaleTimeString('vi-VN');
+    document.getElementById('lastSyncLabel').textContent = 'Cập nhật lúc ' + now;
+    showStatus(`Đã tải ${rows.length} bản ghi thành công.`, 'ok');
+    applyFilter();
+
+  } catch (err) {
+    showStatus('Lỗi kết nối: ' + err.message + '. Kiểm tra lại URL hoặc quyền deploy.', 'error');
+    renderTable([]);
+  }
+}
+
+/* ══════════════════════════════════════
+   Filter & search
+   ══════════════════════════════════════ */
+function applyFilter() {
+  const date   = document.getElementById('filterDate').value;         // "YYYY-MM-DD"
+  const chuyen = document.getElementById('filterChuyen').value;
+  const search = document.getElementById('searchInput').value.toLowerCase().trim();
+
+  let rows = allData;
+
+  if (date) {
+    rows = rows.filter(r => {
+      const d = getF(r, [
+  'Ngày',
+  'ngay','Ngay','date','Date'
+]) || '';
+      // support "YYYY-MM-DD", "DD/MM/YYYY", "MM/DD/YYYY"
+      if (d.includes('-')) return d.startsWith(date);
+      if (d.includes('/')) {
+        const p = d.split('/');
+        if (p.length === 3) {
+          if (p[2].length === 4) { // DD/MM/YYYY
+            const iso = `${p[2]}-${p[1].padStart(2,'0')}-${p[0].padStart(2,'0')}`;
+            return iso === date;
+          }
+        }
+      }
+      return d.startsWith(date);
+    });
+  }
+
+if (chuyen) {
+  rows = rows.filter(r => normalize(
+    getF(r, ['Bộ phận','chuyen','Chuyen','Chuyền','chuyen_so'])
+  ) === normalize(chuyen));
+}
+
+  if (search) {
+    rows = rows.filter(r => {
+      const name = getF(r, ['ten','Ten','Họ tên','ho_ten','HoTen','name']) || '';
+      return name.toLowerCase().includes(search);
+    });
+  }
+
+  renderSummary(rows);
+  renderTable(rows);
+}
+
+function clearFilter() {
+  document.getElementById('filterChuyen').value = '';
+  document.getElementById('searchInput').value  = '';
+  setDefaultDate();
+  applyFilter();
+}
+
+/* ══════════════════════════════════════
+   Helpers: get field with fallback keys
+   ══════════════════════════════════════ */
+function getF(row, keys) {
+  for (const k of keys) {
+    if (row[k] !== undefined && row[k] !== null && row[k] !== '') return row[k];
+  }
+  return '';
+}
+function normalize(str) { return (str || '').trim().toLowerCase(); }
+
+function initials(name) {
+  if (!name) return '?';
+  const parts = name.trim().split(' ');
+  if (parts.length >= 2) return (parts[parts.length-2][0] + parts[parts.length-1][0]).toUpperCase();
+  return name[0].toUpperCase();
+}
+
+/* ══════════════════════════════════════
+   Summary cards
+   ══════════════════════════════════════ */
+function renderSummary(rows) {
+  const vals = rows.map(r => parseFloat(getF(r, ['nangSuat','NangSuat','Năng suất','nang_suat','ns','NS'])) || 0);
+  const total = rows.length;
+  const avg  = total ? Math.round(vals.reduce((a,b)=>a+b,0) / total) : 0;
+  const max  = total ? Math.max(...vals) : 0;
+  const min  = total ? Math.min(...vals) : 0;
+
+  document.getElementById('sTotal').textContent = total || '—';
+  document.getElementById('sAvg').textContent   = total ? avg  : '—';
+  document.getElementById('sMax').textContent   = total ? max  : '—';
+  document.getElementById('sMin').textContent   = total ? min  : '—';
+}
+
+/* ══════════════════════════════════════
+   Table render
+   ══════════════════════════════════════ */
+function setTableLoading() {
+  document.getElementById('tableBody').innerHTML =
+    `<tr><td colspan="7"><div class="state-box"><div class="state-icon"><span class="spinner" style="border-top-color:#0f4c35;border-color:rgba(15,76,53,0.2)"></span></div>Đang tải...</div></td></tr>`;
+  document.getElementById('rowCountLabel').textContent = '...';
+}
+
+function renderTable(rows) {
+  document.getElementById('rowCountLabel').textContent = rows.length + ' bản ghi';
+
+  if (!rows.length) {
+    document.getElementById('tableBody').innerHTML =
+      `<tr><td colspan="7"><div class="state-box"><div class="state-icon">🔍</div>Không có dữ liệu cho bộ lọc này</div></td></tr>`;
+    return;
+  }
+
+  /* Sort: by chuyen → name */
+  const sorted = [...rows].sort((a, b) => {
+    const ca = getF(a, ['chuyen','Chuyen','Chuyền']) || '';
+    const cb = getF(b, ['chuyen','Chuyen','Chuyền']) || '';
+    if (ca !== cb) return ca.localeCompare(cb, 'vi');
+    const na = getF(a, ['ten','Ten','Họ tên','ho_ten','HoTen']) || '';
+    const nb = getF(b, ['ten','Ten','Họ tên','ho_ten','HoTen']) || '';
+    return na.localeCompare(nb, 'vi');
+  });
+
+  const chuyenColors = { 'chuyền 1':'', 'chuyền 2':'c2', 'chuyền 3':'c3', 'chuyền 4':'c4', 'chuyền 5':'c5' };
+
+  let html = '';
+  sorted.forEach((r, i) => {
+    const ten = getF(r, [
+  'Họ và tên',
+  'ten','Ten','Họ tên','ho_ten','HoTen'
+]) || '—';
+    const chuyen = getF(r, [
+  'Bộ phận',
+  'chuyen','Chuyen','Chuyền','chuyen_so'
+]) || '—';
+    const maHang  = getF(r, ['maHang','MaHang','Mã hàng','ma_hang','maDonHang','ma_don','maHang','mahang']) || '—';
+    const congDoan= getF(r, ['congDoan','CongDoan','Công đoạn','cong_doan','so_cong_doan']) || '—';
+    const nsRaw = getF(r, [
+  'Năng suất (sp/ngày)',
+  'nangSuat','NangSuat','Năng suất','nang_suat','ns','NS'
+]);
+    const ns      = parseFloat(nsRaw) || 0;
+    const ngay    = getF(r, ['ngay','Ngay','Ngày','date','Date']) || '—';
+
+    const colorKey = normalize(chuyen);
+    const badgeClass = chuyenColors[colorKey] !== undefined ? chuyenColors[colorKey] : '';
+
+    let nsClass = 'ns-none';
+    if (ns >= 300)      nsClass = 'ns-high';
+    else if (ns >= 150) nsClass = 'ns-mid';
+    else if (ns > 0)    nsClass = 'ns-low';
+
+    html += `
+      <tr>
+        <td style="color:#bbb;font-size:12px">${i + 1}</td>
+        <td>
+          <div class="cell-name">
+            <div class="avatar">${initials(ten)}</div>
+            ${escHtml(ten)}
+          </div>
+        </td>
+        <td><span class="badge-chuyen ${badgeClass}">${escHtml(chuyen)}</span></td>
+        <td style="font-weight:600">${escHtml(maHang)}</td>
+        <td class="num">${escHtml(String(congDoan))}</td>
+        <td class="num">
+          <span class="ns-pill ${nsClass}">${ns > 0 ? ns.toLocaleString('vi-VN') : '—'}</span>
+        </td>
+        <td style="color:#888;font-size:12px">${escHtml(ngay)}</td>
+      </tr>`;
+  });
+
+  document.getElementById('tableBody').innerHTML = html;
+}
+
+function escHtml(s) {
+  return String(s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+</script>
+
+<!--
+════════════════════════════════════════════════════════════════
+  HƯỚNG DẪN: Thêm doGet vào Google Apps Script
+════════════════════════════════════════════════════════════════
+
+Mở Google Apps Script của project hiện tại (script.google.com),
+thêm hàm sau vào file Code.gs:
+
+──────────────────────────────────────────
+function doGet(e) {
+  var action    = e.parameter.action;
+  var sheetName = e.parameter.sheet || 'NangSuat';
+
+  if (action === 'getData') {
+    var ss   = SpreadsheetApp.getActiveSpreadsheet();
+    var sheet = ss.getSheetByName(sheetName);
+    if (!sheet) {
+      return ContentService
+        .createTextOutput(JSON.stringify({ error: 'Sheet not found: ' + sheetName }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+    var data    = sheet.getDataRange().getValues();
+    var headers = data[0];
+    var rows    = data.slice(1)
+      .filter(function(row){ return row.some(function(c){ return c !== ''; }); })
+      .map(function(row){
+        var obj = {};
+        headers.forEach(function(h, i){ obj[h] = row[i]; });
+        return obj;
+      });
+
+    return ContentService
+      .createTextOutput(JSON.stringify({ data: rows }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+
+  return ContentService
+    .createTextOutput(JSON.stringify({ status: 'ok' }))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+──────────────────────────────────────────
+
+Sau đó:
+1. Deploy → New deployment → Web app
+2. Execute as: Me
+3. Who has access: Anyone
+4. Copy URL → dán vào ô "Web App URL" trong dashboard
+
+════════════════════════════════════════════════════════════════
+-->
+</body>
+</html>
