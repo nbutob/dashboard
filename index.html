@@ -428,11 +428,6 @@
           <option>Chuyền 3</option>
           <option>Chuyền 4</option>
           <option>Chuyền 5</option>
-          <option>1</option>
-          <option>2</option>
-          <option>3</option>
-          <option>4</option>
-          <option>5</option>
         </select>
       </div>
       <button class="btn btn-outline" onclick="clearFilter()">✕ Xoá lọc</button>
@@ -607,33 +602,31 @@ async function fetchData() {
 /* Convert any date value to "YYYY-MM-DD" string for comparison */
 function toISO(val) {
   if (!val && val !== 0) return '';
-  // Already a JS Date object (Apps Script sometimes returns these)
-  if (val instanceof Date) {
-    const y = val.getFullYear();
-    const m = String(val.getMonth()+1).padStart(2,'0');
-    const d = String(val.getDate()).padStart(2,'0');
-    return `${y}-${m}-${d}`;
-  }
   const s = String(val).trim();
   if (!s) return '';
-  // YYYY-MM-DD or YYYY-MM-DDThh...
-  if (/^\d{4}-\d{2}-\d{2}/.test(s)) return s.substring(0,10);
+  // YYYY-MM-DD (already correct, no timezone issue)
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+  // ISO with time e.g. "2026-05-30T17:00:00.000Z" → convert UTC to UTC+7
+  if (/^\d{4}-\d{2}-\d{2}T/.test(s)) {
+    const utc = new Date(s);
+    const vn  = new Date(utc.getTime() + 7 * 60 * 60 * 1000);
+    const y = vn.getUTCFullYear();
+    const m = String(vn.getUTCMonth()+1).padStart(2,'0');
+    const d = String(vn.getUTCDate()).padStart(2,'0');
+    return `${y}-${m}-${d}`;
+  }
   // DD/MM/YYYY
   if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(s)) {
     const [d,m,y] = s.split('/');
     return `${y}-${m.padStart(2,'0')}-${d.padStart(2,'0')}`;
   }
-  // MM/DD/YYYY
-  if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(s)) {
-    const [m,d,y] = s.split('/');
-    return `${y}-${m.padStart(2,'0')}-${d.padStart(2,'0')}`;
-  }
-  // Try native Date parse (handles "Mon Jun 01 2026...", ISO, etc.)
+  // Fallback: native parse with UTC+7 offset
   const parsed = new Date(s);
   if (!isNaN(parsed)) {
-    const y = parsed.getFullYear();
-    const m = String(parsed.getMonth()+1).padStart(2,'0');
-    const d = String(parsed.getDate()).padStart(2,'0');
+    const vn = new Date(parsed.getTime() + 7 * 60 * 60 * 1000);
+    const y = vn.getUTCFullYear();
+    const m = String(vn.getUTCMonth()+1).padStart(2,'0');
+    const d = String(vn.getUTCDate()).padStart(2,'0');
     return `${y}-${m}-${d}`;
   }
   return s;
