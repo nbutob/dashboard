@@ -608,10 +608,7 @@ function applyFilter() {
 
   if (date) {
     rows = rows.filter(r => {
-      const d = getF(r, [
-  'Ngày',
-  'ngay','Ngay','date','Date'
-]) || '';
+      const d = String(r["Ngày"] || '');
       // support "YYYY-MM-DD", "DD/MM/YYYY", "MM/DD/YYYY"
       if (d.includes('-')) return d.startsWith(date);
       if (d.includes('/')) {
@@ -628,17 +625,18 @@ function applyFilter() {
   }
 
 if (chuyen) {
-  rows = rows.filter(r => normalize(
-    getF(r, ['Bộ phận','chuyen','Chuyen','Chuyền','chuyen_so'])
-  ) === normalize(chuyen));
+  rows = rows.filter(r =>
+    (r["Bộ phận"] || "").trim().toLowerCase() ===
+    chuyen.trim().toLowerCase()
+  );
 }
 
   if (search) {
-    rows = rows.filter(r => {
-      const name = getF(r, ['ten','Ten','Họ tên','ho_ten','HoTen','name']) || '';
-      return name.toLowerCase().includes(search);
-    });
-  }
+  rows = rows.filter(r => {
+    const name = r["Họ và tên"] || '';
+    return name.toLowerCase().includes(search);
+  });
+}
 
   renderSummary(rows);
   renderTable(rows);
