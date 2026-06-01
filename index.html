@@ -610,16 +610,20 @@ function applyFilter() {
   let rows = allData;
 
 if (date) {
-  rows = rows.filter(r => r["Ngày"] === date);
-}
-  console.log("After date:", rows.length);
- 
+  rows = rows.filter(r => {
 
-if (chuyen) {
-  rows = rows.filter(r =>
-    (r["Bộ phận"] || "").trim().toLowerCase() ===
-    chuyen.trim().toLowerCase()
-  );
+    const rawNgay = r["Ngày"];
+    if (!rawNgay) return false;
+
+    const d = new Date(rawNgay);
+
+    const localDate =
+      d.getFullYear() + '-' +
+      String(d.getMonth() + 1).padStart(2, '0') + '-' +
+      String(d.getDate()).padStart(2, '0');
+
+    return localDate === date;
+  });
 }
   console.log("After chuyen:", rows.length);
 
@@ -724,7 +728,18 @@ function renderTable(rows) {
   'nangSuat','NangSuat','Năng suất','nang_suat','ns','NS'
 ]);
     const ns      = parseFloat(nsRaw) || 0;
-    const ngay    = getF(r, ['ngay','Ngay','Ngày','date','Date']) || '—';
+    const rawNgay = r["Ngày"];
+
+let ngay = "—";
+
+if (rawNgay) {
+  const d = new Date(rawNgay);
+
+  ngay =
+    String(d.getDate()).padStart(2, '0') + '/' +
+    String(d.getMonth() + 1).padStart(2, '0') + '/' +
+    d.getFullYear();
+}
 
     const colorKey = normalize(chuyen);
     const badgeClass = chuyenColors[colorKey] !== undefined ? chuyenColors[colorKey] : '';
