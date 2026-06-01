@@ -607,22 +607,21 @@ function applyFilter() {
   let rows = allData;
 
   if (date) {
-    rows = rows.filter(r => {
-      return r["Ngày"] === date;
-    });
-  }
+  rows = rows.filter(r => {
 
-  if (chuyen) {
-    rows = rows.filter(r => r["Bộ phận"] === chuyen);
-  }
+    const raw = r["Ngày"];
+    if (!raw) return false;
 
-  if (search) {
-    rows = rows.filter(r => {
-      const name = r["Họ và tên"] || '';
-      return name.toLowerCase().includes(search);
-    });
-  }
+    const d = new Date(raw);
 
+    const rowDate =
+      d.getFullYear() + "-" +
+      String(d.getMonth()+1).padStart(2,"0") + "-" +
+      String(d.getDate()).padStart(2,"0");
+
+    return rowDate === date;
+  });
+}
   renderSummary(rows);
   renderTable(rows);
 }
