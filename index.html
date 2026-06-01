@@ -374,7 +374,6 @@
 <body>
 
 <!-- ══════════════ LOGIN ══════════════ -->
-
 <div id="loginScreen">
   <div class="login-box">
     <div class="login-brand">
@@ -393,7 +392,6 @@
     <div class="login-err" id="loginErr"></div>
   </div>
 </div>
-
 
 <!-- ══════════════ APP ══════════════ -->
 <div id="appScreen">
@@ -433,6 +431,7 @@
         </select>
       </div>
       <button class="btn btn-outline" onclick="clearFilter()">✕ Xoá lọc</button>
+      <button class="btn btn-outline" onclick="showAll()" style="border-color:#1976d2;color:#1976d2">📋 Xem tất cả</button>
     </div>
 
     <!-- Summary cards -->
@@ -503,9 +502,9 @@
 /* ══════════════════════════════════════
    CẤU HÌNH – đổi mật khẩu tại đây
    ══════════════════════════════════════ */
-const APP_PASSWORD = "locnguyentotruong";  // ← đổi mật khẩu ở đây*/
-const WEBAPP_URL   = "https://script.google.com/macros/s/AKfycbyKBUzegImjvJDghjvXUl54xW_T3xmQo8Nlh0frwlxW_kWeWfC66asJHT9Nln-VRk4r/exec";  // ← dán Google Apps Script URL vào đây
-const SHEET_TAB    = "Nangsuat";            // ← tên tab trong Google Sheets
+const APP_PASSWORD = "totruong2024";  // ← đổi mật khẩu ở đây
+const WEBAPP_URL   = "ĐIỀN_URL_VÀO_ĐÂY";  // ← dán Google Apps Script URL vào đây
+const SHEET_TAB    = "NangSuat";            // ← tên tab trong Google Sheets
 
 /* ══════════════════════════════════════
    State
@@ -587,7 +586,15 @@ async function fetchData() {
     allData = rows;
     const now = new Date().toLocaleTimeString('vi-VN');
     document.getElementById('lastSyncLabel').textContent = 'Cập nhật lúc ' + now;
-    showStatus(`Đã tải ${rows.length} bản ghi thành công.`, 'ok');
+    if (rows.length > 0) {
+      const r0 = rows[0];
+      const keys = Object.keys(r0);
+      const debugMsg = '🔍 Tên cột: ' + keys.join(' | ') + ' — Ngày row[0]: ' + JSON.stringify(r0[keys.find(k=>k.toLowerCase().includes('ng'))]);
+      showStatus(debugMsg, 'info');
+      console.log('DEBUG all rows:', JSON.stringify(rows.slice(0,3)));
+    } else {
+      showStatus('Đã tải 0 bản ghi.', 'ok');
+    }
     applyFilter();
 
   } catch (err) {
@@ -599,29 +606,66 @@ async function fetchData() {
 /* ══════════════════════════════════════
    Filter & search
    ══════════════════════════════════════ */
+/* Convert any date value to "YYYY-MM-DD" string for comparison */
+function toISO(val) {
+  if (!val && val !== 0) return '';
+  // Already a JS Date object (Apps Script sometimes returns these)
+  if (val instanceof Date) {
+    const y = val.getFullYear();
+    const m = String(val.getMonth()+1).padStart(2,'0');
+    const d = String(val.getDate()).padStart(2,'0');
+    return `${y}-${m}-${d}`;
+  }
+  const s = String(val).trim();
+  if (!s) return '';
+  // YYYY-MM-DD or YYYY-MM-DDThh...
+  if (/^\d{4}-\d{2}-\d{2}/.test(s)) return s.substring(0,10);
+  // DD/MM/YYYY
+  if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(s)) {
+    const [d,m,y] = s.split('/');
+    return `${y}-${m.padStart(2,'0')}-${d.padStart(2,'0')}`;
+  }
+  // MM/DD/YYYY
+  if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(s)) {
+    const [m,d,y] = s.split('/');
+    return `${y}-${m.padStart(2,'0')}-${d.padStart(2,'0')}`;
+  }
+  // Try native Date parse (handles "Mon Jun 01 2026...", ISO, etc.)
+  const parsed = new Date(s);
+  if (!isNaN(parsed)) {
+    const y = parsed.getFullYear();
+    const m = String(parsed.getMonth()+1).padStart(2,'0');
+    const d = String(parsed.getDate()).padStart(2,'0');
+    return `${y}-${m}-${d}`;
+  }
+  return s;
+}
+
 function applyFilter() {
-  const date = document.getElementById('filterDate').value;
+  const date   = document.getElementById('filterDate').value;   // "YYYY-MM-DD"
   const chuyen = document.getElementById('filterChuyen').value;
   const search = document.getElementById('searchInput').value.toLowerCase().trim();
 
   let rows = allData;
 
   if (date) {
-  rows = rows.filter(r => {
+    rows = rows.filter(r => {
+      const raw = getF(r, ['ngay','Ngay','Ngày','Ngay lam','Ngày làm','date','Date','ngayLam']);
+      return toISO(raw) === date;
+    });
+  }
 
-    const raw = r["Ngày"];
-    if (!raw) return false;
+  if (chuyen) {
+    rows = rows.filter(r => normalize(getF(r, ['chuyen','Chuyen','Chuyền','chuyen_so','Bộ phận / Chuyền','Bo phan'])) === normalize(chuyen));
+  }
 
-    const d = new Date(raw);
+  if (search) {
+    rows = rows.filter(r => {
+      const name = getF(r, ['ten','Ten','Họ tên','ho_ten','HoTen','Họ và tên','name']) || '';
+      return name.toLowerCase().includes(search);
+    });
+  }
 
-    const rowDate =
-      d.getFullYear() + "-" +
-      String(d.getMonth()+1).padStart(2,"0") + "-" +
-      String(d.getDate()).padStart(2,"0");
-
-    return rowDate === date;
-  });
-}
   renderSummary(rows);
   renderTable(rows);
 }
@@ -633,12 +677,24 @@ function clearFilter() {
   applyFilter();
 }
 
+function showAll() {
+  document.getElementById('filterDate').value   = '';
+  document.getElementById('filterChuyen').value = '';
+  document.getElementById('searchInput').value  = '';
+  applyFilter();
+}
+
 /* ══════════════════════════════════════
    Helpers: get field with fallback keys
    ══════════════════════════════════════ */
 function getF(row, keys) {
   for (const k of keys) {
     if (row[k] !== undefined && row[k] !== null && row[k] !== '') return row[k];
+  }
+  // fallback: case-insensitive search
+  const lkeys = keys.map(k => k.toLowerCase());
+  for (const rk of Object.keys(row)) {
+    if (lkeys.includes(rk.toLowerCase()) && row[rk] !== undefined && row[rk] !== null && row[rk] !== '') return row[rk];
   }
   return '';
 }
@@ -655,9 +711,7 @@ function initials(name) {
    Summary cards
    ══════════════════════════════════════ */
 function renderSummary(rows) {
-  const vals = rows.map(r =>
-  parseFloat(r["Năng suất (sp/ngày)"]) || 0
-);
+  const vals = rows.map(r => parseFloat(getF(r, ['nangSuat','NangSuat','Năng suất','nang_suat','ns','NS'])) || 0);
   const total = rows.length;
   const avg  = total ? Math.round(vals.reduce((a,b)=>a+b,0) / total) : 0;
   const max  = total ? Math.max(...vals) : 0;
@@ -701,33 +755,13 @@ function renderTable(rows) {
 
   let html = '';
   sorted.forEach((r, i) => {
-    const ten = getF(r, [
-  'Họ và tên',
-  'ten','Ten','Họ tên','ho_ten','HoTen'
-]) || '—';
-    const chuyen = getF(r, [
-  'Bộ phận',
-  'chuyen','Chuyen','Chuyền','chuyen_so'
-]) || '—';
+    const ten     = getF(r, ['ten','Ten','Họ tên','ho_ten','HoTen']) || '—';
+    const chuyen  = getF(r, ['chuyen','Chuyen','Chuyền','chuyen_so']) || '—';
     const maHang  = getF(r, ['maHang','MaHang','Mã hàng','ma_hang','maDonHang','ma_don','maHang','mahang']) || '—';
     const congDoan= getF(r, ['congDoan','CongDoan','Công đoạn','cong_doan','so_cong_doan']) || '—';
-    const nsRaw = getF(r, [
-  'Năng suất (sp/ngày)',
-  'nangSuat','NangSuat','Năng suất','nang_suat','ns','NS'
-]);
+    const nsRaw   = getF(r, ['nangSuat','NangSuat','Năng suất','nang_suat','ns','NS']);
     const ns      = parseFloat(nsRaw) || 0;
-    const rawNgay = r["Ngày"];
-
-let ngay = "—";
-
-if (rawNgay) {
-  const d = new Date(rawNgay);
-
-  ngay =
-    String(d.getDate()).padStart(2, '0') + '/' +
-    String(d.getMonth() + 1).padStart(2, '0') + '/' +
-    d.getFullYear();
-}
+    const ngay    = getF(r, ['ngay','Ngay','Ngày','date','Date']) || '—';
 
     const colorKey = normalize(chuyen);
     const badgeClass = chuyenColors[colorKey] !== undefined ? chuyenColors[colorKey] : '';
