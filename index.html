@@ -600,39 +600,28 @@ async function fetchData() {
    Filter & search
    ══════════════════════════════════════ */
 function applyFilter() {
-  const date   = "";         // "YYYY-MM-DD"
+  const date = document.getElementById('filterDate').value;
   const chuyen = document.getElementById('filterChuyen').value;
   const search = document.getElementById('searchInput').value.toLowerCase().trim();
-  console.log("Date:", date);
-  console.log("Chuyen:", chuyen);
-  console.log("Before:", allData.length);
 
   let rows = allData;
 
-if (date) {
-  rows = rows.filter(r => {
+  if (date) {
+    rows = rows.filter(r => {
+      return r["Ngày"] === date;
+    });
+  }
 
-    const rawNgay = r["Ngày"];
-    if (!rawNgay) return false;
-
-    const d = new Date(rawNgay);
-
-    const localDate =
-      d.getFullYear() + '-' +
-      String(d.getMonth() + 1).padStart(2, '0') + '-' +
-      String(d.getDate()).padStart(2, '0');
-
-    return localDate === date;
-  });
-}
-  console.log("After chuyen:", rows.length);
+  if (chuyen) {
+    rows = rows.filter(r => r["Bộ phận"] === chuyen);
+  }
 
   if (search) {
-  rows = rows.filter(r => {
-    const name = r["Họ và tên"] || '';
-    return name.toLowerCase().includes(search);
-  });
-}
+    rows = rows.filter(r => {
+      const name = r["Họ và tên"] || '';
+      return name.toLowerCase().includes(search);
+    });
+  }
 
   renderSummary(rows);
   renderTable(rows);
