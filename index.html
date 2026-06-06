@@ -8,7 +8,6 @@
 <meta name="theme-color" content="#0f4c35" />
 <title>Dashboard Tổ Trưởng – Năng Suất</title>
 <style>
-  /* ── Reset & base ── */
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   html { font-size: 16px; }
   body {
@@ -131,7 +130,6 @@
   /* ── Main content ── */
   .main { max-width: 860px; margin: 0 auto; padding: 1.25rem; }
 
-
   /* ── Buttons ── */
   .btn {
     display: inline-flex;
@@ -179,10 +177,44 @@
     padding: 1rem 1.25rem;
     margin-bottom: 1.25rem;
     box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+  .filter-row {
     display: flex;
     flex-wrap: wrap;
     align-items: flex-end;
     gap: 12px;
+  }
+  /* NEW: date range row */
+  .filter-date-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 12px;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1.5px solid #f0f0f0;
+  }
+  .filter-mode-tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+  .tab-btn {
+    height: 32px;
+    padding: 0 14px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    border: 1.5px solid #e0e0e0;
+    background: #fff;
+    color: #888;
+    transition: all 0.15s;
+  }
+  .tab-btn.active {
+    background: #0f4c35;
+    color: #fff;
+    border-color: #0f4c35;
   }
   .filter-field { display: flex; flex-direction: column; gap: 5px; }
   .filter-field label { font-size: 12px; font-weight: 700; color: #888; }
@@ -201,6 +233,36 @@
   }
   .filter-field input[type="date"]:focus,
   .filter-field select:focus { border-color: #0f4c35; }
+  /* ── Group button ── */
+  .btn-grouped {
+    background: #e8f5e9;
+    color: #1b5e20;
+    border: 1.5px solid #a5d6a7;
+    height: 38px;
+    padding: 0 14px;
+    border-radius: 9px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.15s;
+  }
+  .btn-grouped.on {
+    background: #0f4c35;
+    color: #fff;
+    border-color: #0f4c35;
+  }
+  .btn-grouped:hover { opacity: 0.85; }
+
+  /* date separator */
+  .date-sep {
+    font-size: 18px;
+    color: #bbb;
+    padding-bottom: 8px;
+    align-self: flex-end;
+  }
 
   /* ── Summary cards ── */
   .summary-grid {
@@ -220,12 +282,56 @@
   .summary-card.amber { border-top-color: #e67e22; }
   .summary-card.blue  { border-top-color: #1976d2; }
   .summary-card.red   { border-top-color: #e53935; }
+  .summary-card.purple { border-top-color: #7b1fa2; }
   .s-val  { font-size: 26px; font-weight: 800; color: #0f4c35; line-height: 1; }
-  .amber .s-val { color: #e67e22; }
-  .blue  .s-val { color: #1976d2; }
-  .red   .s-val { color: #e53935; }
+  .amber  .s-val { color: #e67e22; }
+  .blue   .s-val { color: #1976d2; }
+  .red    .s-val { color: #e53935; }
+  .purple .s-val { color: #7b1fa2; }
   .s-lbl { font-size: 12px; color: #888; margin-top: 5px; }
   .s-sub { font-size: 11px; color: #bbb; margin-top: 2px; }
+
+  /* ── Cumulative banner ── */
+  .cumul-banner {
+    background: linear-gradient(135deg, #0f4c35 0%, #1a7a55 100%);
+    border-radius: 14px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.25rem;
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(15,76,53,0.2);
+    display: none;
+  }
+  .cumul-banner.active { display: block; }
+  .cumul-title {
+    font-size: 12px;
+    font-weight: 700;
+    opacity: 0.75;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 8px;
+  }
+  .cumul-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 10px;
+  }
+  .cumul-item { }
+  .cumul-val {
+    font-size: 24px;
+    font-weight: 800;
+    line-height: 1;
+  }
+  .cumul-lbl {
+    font-size: 11px;
+    opacity: 0.7;
+    margin-top: 3px;
+  }
+  .cumul-date {
+    font-size: 11px;
+    opacity: 0.6;
+    margin-top: 8px;
+    font-style: italic;
+  }
 
   /* ── Workers table ── */
   .table-card {
@@ -247,7 +353,6 @@
   .table-head-title { font-size: 15px; font-weight: 700; color: #1a1a1a; }
   .table-head-count { font-size: 13px; color: #888; }
 
-  /* Search inside table */
   .tbl-search {
     height: 34px; padding: 0 11px;
     border: 1.5px solid #e4e4e4;
@@ -259,7 +364,6 @@
   }
   .tbl-search:focus { border-color: #0f4c35; }
 
-  /* Scrollable table wrapper */
   .table-scroll { overflow-x: auto; }
   table {
     width: 100%;
@@ -288,7 +392,6 @@
   tr:last-child td { border-bottom: none; }
   tr:hover td { background: #f9fbf9; }
 
-  /* Avatar */
   .avatar {
     width: 30px; height: 30px;
     border-radius: 50%;
@@ -304,7 +407,6 @@
   }
   .cell-name { display: flex; align-items: center; white-space: nowrap; }
 
-  /* Chuyền badge */
   .badge-chuyen {
     display: inline-block;
     padding: 2px 9px;
@@ -319,7 +421,6 @@
   .badge-chuyen.c4 { background: #fce4ec; color: #880e4f; }
   .badge-chuyen.c5 { background: #f3e5f5; color: #4a148c; }
 
-  /* NS pill */
   .ns-pill {
     display: inline-block;
     padding: 3px 10px;
@@ -332,7 +433,6 @@
   .ns-low    { background: #ffebee; color: #b71c1c; }
   .ns-none   { background: #f5f5f5; color: #aaa; }
 
-  /* ── Empty / loading states ── */
   .state-box {
     padding: 3rem 1rem;
     text-align: center;
@@ -341,7 +441,6 @@
   }
   .state-box .state-icon { font-size: 38px; margin-bottom: 10px; }
 
-  /* ── Spinner ── */
   .spinner {
     display: inline-block;
     width: 18px; height: 18px;
@@ -354,7 +453,6 @@
   }
   @keyframes spin { to { transform: rotate(360deg); } }
 
-  /* ── Footer ── */
   .footer {
     text-align: center;
     font-size: 12px;
@@ -363,11 +461,11 @@
     margin-top: 0.5rem;
   }
 
-  /* ── Responsive ── */
   @media(max-width:600px) {
     .main { padding: 1rem 0.85rem; }
     .filter-bar { gap: 8px; }
     .tbl-search { width: 130px; }
+    .date-sep { display: none; }
   }
 </style>
 </head>
@@ -383,7 +481,6 @@
         <p>Xưởng may – Theo dõi năng suất</p>
       </div>
     </div>
-
     <div class="form-group">
       <label for="pwInput">Mật khẩu</label>
       <input type="password" id="pwInput" placeholder="Nhập mật khẩu..." autocomplete="current-password" />
@@ -396,7 +493,6 @@
 <!-- ══════════════ APP ══════════════ -->
 <div id="appScreen">
 
-  <!-- Top bar -->
   <div class="topbar">
     <div class="topbar-left">
       <div class="topbar-icon">📊</div>
@@ -410,28 +506,81 @@
 
   <div class="main">
 
-    <!-- Status alert -->
     <div class="status-alert" id="statusAlert"></div>
 
     <!-- Filter bar -->
     <div class="filter-bar">
-      <div class="filter-field">
-        <label>📅 Chọn ngày</label>
-        <input type="date" id="filterDate" onchange="applyFilter()" />
+
+      <!-- Mode tabs -->
+      <div class="filter-mode-tabs">
+        <button class="tab-btn active" id="tabSingle" onclick="switchMode('single')">📅 Ngày đơn</button>
+        <button class="tab-btn" id="tabRange" onclick="switchMode('range')">📆 Khoảng ngày</button>
       </div>
-      <div class="filter-field">
-        <label>🏭 Chuyền</label>
-        <select id="filterChuyen" onchange="applyFilter()">
-          <option value="">Tất cả chuyền</option>
-          <option>Chuyền 1</option>
-          <option>Chuyền 2</option>
-          <option>Chuyền 3</option>
-          <option>Chuyền 4</option>
-          <option>Chuyền 5</option>
-        </select>
+
+      <!-- Single date row -->
+      <div class="filter-date-row" id="rowSingle">
+        <div class="filter-field">
+          <label>📅 Chọn ngày</label>
+          <input type="date" id="filterDate" onchange="applyFilter()" />
+        </div>
       </div>
-      <button class="btn btn-outline" onclick="clearFilter()">✕ Xoá lọc</button>
-      <button class="btn btn-outline" onclick="showAll()" style="border-color:#1976d2;color:#1976d2">📋 Xem tất cả</button>
+
+      <!-- Date range row -->
+      <div class="filter-date-row" id="rowRange" style="display:none">
+        <div class="filter-field">
+          <label>📅 Từ ngày</label>
+          <input type="date" id="filterDateFrom" onchange="applyFilter()" />
+        </div>
+        <div class="date-sep">→</div>
+        <div class="filter-field">
+          <label>📅 Đến ngày</label>
+          <input type="date" id="filterDateTo" onchange="applyFilter()" />
+        </div>
+        <button class="btn btn-grouped" id="btnGroup" onclick="toggleGrouped()" style="align-self:flex-end">
+          📊 Xem tổng hợp
+        </button>
+      </div>
+
+      <!-- Chuyen + actions -->
+      <div class="filter-row">
+        <div class="filter-field">
+          <label>🏭 Chuyền</label>
+          <select id="filterChuyen" onchange="applyFilter()">
+            <option value="">Tất cả chuyền</option>
+            <option>Chuyền 1</option>
+            <option>Chuyền 2</option>
+            <option>Chuyền 3</option>
+            <option>Chuyền 4</option>
+            <option>Chuyền 5</option>
+          </select>
+        </div>
+        <button class="btn btn-outline" onclick="clearFilter()">✕ Xoá lọc</button>
+        <button class="btn btn-outline" onclick="showAll()" style="border-color:#1976d2;color:#1976d2">📋 Xem tất cả</button>
+      </div>
+    </div>
+
+    <!-- ── Cumulative banner (tổng đến ngày mới nhất) ── -->
+    <div class="cumul-banner" id="cumulBanner">
+      <div class="cumul-title">📈 Tổng tích luỹ đến ngày mới nhất</div>
+      <div class="cumul-grid">
+        <div class="cumul-item">
+          <div class="cumul-val" id="cumulTotal">—</div>
+          <div class="cumul-lbl">Tổng lượt chấm công</div>
+        </div>
+        <div class="cumul-item">
+          <div class="cumul-val" id="cumulNS">—</div>
+          <div class="cumul-lbl">Tổng năng suất (sp)</div>
+        </div>
+        <div class="cumul-item">
+          <div class="cumul-val" id="cumulAvg">—</div>
+          <div class="cumul-lbl">NS trung bình / người / ngày</div>
+        </div>
+        <div class="cumul-item">
+          <div class="cumul-val" id="cumulDays">—</div>
+          <div class="cumul-lbl">Số ngày có dữ liệu</div>
+        </div>
+      </div>
+      <div class="cumul-date" id="cumulDateNote"></div>
     </div>
 
     <!-- Summary cards -->
@@ -439,7 +588,7 @@
       <div class="summary-card">
         <div class="s-val" id="sTotal">—</div>
         <div class="s-lbl">Tổng công nhân</div>
-        <div class="s-sub">bản ghi trong ngày</div>
+        <div class="s-sub" id="sSubTotal">bản ghi trong ngày</div>
       </div>
       <div class="summary-card amber">
         <div class="s-val" id="sAvg">—</div>
@@ -462,14 +611,14 @@
     <div class="table-card">
       <div class="table-head">
         <div>
-          <div class="table-head-title">Danh sách công nhân</div>
+          <div class="table-head-title" id="tableTitle">Danh sách công nhân</div>
           <div class="table-head-count" id="rowCountLabel">0 bản ghi</div>
         </div>
         <input class="tbl-search" type="text" id="searchInput" placeholder="🔍 Tìm tên..." oninput="applyFilter()" />
       </div>
       <div class="table-scroll">
         <table id="mainTable">
-          <thead>
+          <thead id="tableHead">
             <tr>
               <th>#</th>
               <th>Họ và tên</th>
@@ -494,22 +643,24 @@
       </div>
     </div>
 
-    <div class="footer">Dashboard Tổ Trưởng · Lộc Nguyên Garment · v1.0</div>
+    <div class="footer">Dashboard Tổ Trưởng · Lộc Nguyên Garment · v1.1</div>
   </div>
 </div>
 
 <script>
 /* ══════════════════════════════════════
-   CẤU HÌNH – đổi mật khẩu tại đây
+   CẤU HÌNH
    ══════════════════════════════════════ */
-const APP_PASSWORD = "a";  // ← đổi mật khẩu ở đây
-const WEBAPP_URL   = "https://script.google.com/macros/s/AKfycbzF1G_Am0kkfquBn66IeD6Q49TbkOogO6WMUzFmpJYLZ2rRNZvP1pmc8V7hzELoAW35/exec";  // ← dán Google Apps Script URL vào đây
-const SHEET_TAB    = "NangSuat";            // ← tên tab trong Google Sheets
+const APP_PASSWORD = "a";
+const WEBAPP_URL   = "https://script.google.com/macros/s/AKfycbzF1G_Am0kkfquBn66IeD6Q49TbkOogO6WMUzFmpJYLZ2rRNZvP1pmc8V7hzELoAW35/exec";
+const SHEET_TAB    = "NangSuat";
 
 /* ══════════════════════════════════════
    State
    ══════════════════════════════════════ */
-let allData = [];  // raw rows from Sheets
+let allData   = [];
+let dateMode  = 'single';   // 'single' | 'range'
+let viewMode  = 'detail';   // 'detail' | 'grouped'  (chỉ áp dụng khi dateMode==='range')
 
 /* ══════════════════════════════════════
    Login / Logout
@@ -538,9 +689,52 @@ function doLogout() {
 }
 
 /* ══════════════════════════════════════
-   Status helper
+   Mode switch: single vs range
    ══════════════════════════════════════ */
-function showStatus(msg, type /* ok | error | info */) {
+function switchMode(mode) {
+  dateMode = mode;
+  document.getElementById('tabSingle').classList.toggle('active', mode === 'single');
+  document.getElementById('tabRange').classList.toggle('active', mode === 'range');
+  document.getElementById('rowSingle').style.display = mode === 'single' ? '' : 'none';
+  document.getElementById('rowRange').style.display  = mode === 'range'  ? '' : 'none';
+
+  if (mode === 'range') {
+    // pre-fill range: from = 7 days ago, to = today
+    const today = getVNDateStr();
+    const from  = offsetDate(today, -6);
+    if (!document.getElementById('filterDateFrom').value) document.getElementById('filterDateFrom').value = from;
+    if (!document.getElementById('filterDateTo').value)   document.getElementById('filterDateTo').value   = today;
+  } else {
+    // back to single → reset to detail view
+    viewMode = 'detail';
+    updateGroupBtn();
+  }
+  applyFilter();
+}
+
+/* ══════════════════════════════════════
+   Toggle grouped view
+   ══════════════════════════════════════ */
+function toggleGrouped() {
+  viewMode = (viewMode === 'grouped') ? 'detail' : 'grouped';
+  updateGroupBtn();
+  applyFilter();
+}
+
+function updateGroupBtn() {
+  const btn = document.getElementById('btnGroup');
+  if (!btn) return;
+  if (viewMode === 'grouped') {
+    btn.textContent = '📋 Xem chi tiết';
+    btn.classList.add('on');
+  } else {
+    btn.textContent = '📊 Xem tổng hợp';
+    btn.classList.remove('on');
+  }
+}
+
+
+function showStatus(msg, type) {
   const el = document.getElementById('statusAlert');
   const icons = { ok: '✅', error: '❌', info: 'ℹ️' };
   el.className = 'status-alert active ' + type;
@@ -549,101 +743,144 @@ function showStatus(msg, type /* ok | error | info */) {
 }
 
 /* ══════════════════════════════════════
-   Default date = today (Vietnam)
+   Date helpers
    ══════════════════════════════════════ */
-function setDefaultDate() {
+function getVNDateStr() {
   const now = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Ho_Chi_Minh' }));
-  const yyyy = now.getFullYear();
-  const mm   = String(now.getMonth() + 1).padStart(2, '0');
-  const dd   = String(now.getDate()).padStart(2, '0');
-  document.getElementById('filterDate').value = `${yyyy}-${mm}-${dd}`;
+  return fmtISO(now.getFullYear(), now.getMonth() + 1, now.getDate());
+}
+
+function fmtISO(y, m, d) {
+  return `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+}
+
+function offsetDate(isoStr, days) {
+  const d = new Date(isoStr + 'T00:00:00');
+  d.setDate(d.getDate() + days);
+  return fmtISO(d.getFullYear(), d.getMonth() + 1, d.getDate());
+}
+
+function setDefaultDate() {
+  document.getElementById('filterDate').value = getVNDateStr();
+}
+
+function toISO(val) {
+  if (!val && val !== 0) return '';
+  const s = String(val).trim();
+  if (!s) return '';
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+  if (/^\d{4}-\d{2}-\d{2}T/.test(s)) {
+    const vn = new Date(new Date(s).getTime() + 7 * 3600000);
+    return fmtISO(vn.getUTCFullYear(), vn.getUTCMonth()+1, vn.getUTCDate());
+  }
+  if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(s)) {
+    const [d,m,y] = s.split('/');
+    return fmtISO(+y, +m, +d);
+  }
+  const parsed = new Date(s);
+  if (!isNaN(parsed)) {
+    const vn = new Date(parsed.getTime() + 7 * 3600000);
+    return fmtISO(vn.getUTCFullYear(), vn.getUTCMonth()+1, vn.getUTCDate());
+  }
+  return s;
 }
 
 /* ══════════════════════════════════════
-   Fetch data from Google Apps Script
+   Fetch data
    ══════════════════════════════════════ */
 async function fetchData() {
   const url = WEBAPP_URL;
-  const tab = SHEET_TAB;
-
   if (!url || url === 'ĐIỀN_URL_VÀO_ĐÂY') {
     showStatus('Chưa có dữ liệu. Liên hệ quản lý để được hỗ trợ.', 'error');
     return;
   }
-
   setTableLoading();
   showStatus('Đang tải dữ liệu từ Google Sheets...', 'info');
-
   try {
-    const res  = await fetch(`${url}?action=getData&sheet=${encodeURIComponent(tab)}`);
+    const res  = await fetch(`${url}?action=getData&sheet=${encodeURIComponent(SHEET_TAB)}`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const json = await res.json();
-
     let rows = [];
-    if (Array.isArray(json))          rows = json;
+    if (Array.isArray(json))           rows = json;
     else if (Array.isArray(json.data)) rows = json.data;
     else throw new Error('Định dạng dữ liệu không đúng');
-
     allData = rows;
-    const now = new Date().toLocaleTimeString('vi-VN');
-    document.getElementById('lastSyncLabel').textContent = 'Cập nhật lúc ' + now;
+    document.getElementById('lastSyncLabel').textContent = 'Cập nhật lúc ' + new Date().toLocaleTimeString('vi-VN');
     showStatus(`Đã tải ${rows.length} bản ghi thành công.`, 'ok');
+    renderCumulative();
     applyFilter();
-
   } catch (err) {
-    showStatus('Lỗi kết nối: ' + err.message + '. Kiểm tra lại URL hoặc quyền deploy.', 'error');
+    showStatus('Lỗi kết nối: ' + err.message, 'error');
     renderTable([]);
   }
 }
 
 /* ══════════════════════════════════════
-   Filter & search
+   Cumulative banner – tổng đến ngày MỚI NHẤT
    ══════════════════════════════════════ */
-/* Convert any date value to "YYYY-MM-DD" string for comparison */
-function toISO(val) {
-  if (!val && val !== 0) return '';
-  const s = String(val).trim();
-  if (!s) return '';
-  // YYYY-MM-DD (already correct, no timezone issue)
-  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
-  // ISO with time e.g. "2026-05-30T17:00:00.000Z" → convert UTC to UTC+7
-  if (/^\d{4}-\d{2}-\d{2}T/.test(s)) {
-    const utc = new Date(s);
-    const vn  = new Date(utc.getTime() + 7 * 60 * 60 * 1000);
-    const y = vn.getUTCFullYear();
-    const m = String(vn.getUTCMonth()+1).padStart(2,'0');
-    const d = String(vn.getUTCDate()).padStart(2,'0');
-    return `${y}-${m}-${d}`;
+function renderCumulative() {
+  if (!allData.length) {
+    document.getElementById('cumulBanner').classList.remove('active');
+    return;
   }
-  // DD/MM/YYYY
-  if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(s)) {
-    const [d,m,y] = s.split('/');
-    return `${y}-${m.padStart(2,'0')}-${d.padStart(2,'0')}`;
-  }
-  // Fallback: native parse with UTC+7 offset
-  const parsed = new Date(s);
-  if (!isNaN(parsed)) {
-    const vn = new Date(parsed.getTime() + 7 * 60 * 60 * 1000);
-    const y = vn.getUTCFullYear();
-    const m = String(vn.getUTCMonth()+1).padStart(2,'0');
-    const d = String(vn.getUTCDate()).padStart(2,'0');
-    return `${y}-${m}-${d}`;
-  }
-  return s;
+
+  // Find latest date in all data
+  const dates = allData.map(r => toISO(getF(r, ['Ngày','ngay','Ngay','Ngay lam','Ngày làm','date','Date','ngayLam']))).filter(Boolean);
+  if (!dates.length) return;
+  const latestDate = dates.sort().pop();   // max ISO date
+
+  // All rows up to (and including) latestDate
+  const cumulRows = allData.filter(r => {
+    const d = toISO(getF(r, ['Ngày','ngay','Ngay','Ngay lam','Ngày làm','date','Date','ngayLam']));
+    return d && d <= latestDate;
+  });
+
+  const vals = cumulRows.map(r => parseFloat(getF(r, ['Năng suất (sp/ngày)','nangSuat','NangSuat','Năng suất','nang_suat','ns','NS'])) || 0);
+  const totalNS = vals.reduce((a,b)=>a+b,0);
+  const avgNS   = cumulRows.length ? Math.round(totalNS / cumulRows.length) : 0;
+  const uniqueDays = new Set(dates.filter(d => d <= latestDate)).size;
+
+  // Format latestDate → DD/MM/YYYY
+  const [ly,lm,ld] = latestDate.split('-');
+
+  document.getElementById('cumulTotal').textContent = cumulRows.length.toLocaleString('vi-VN');
+  document.getElementById('cumulNS').textContent    = totalNS.toLocaleString('vi-VN');
+  document.getElementById('cumulAvg').textContent   = avgNS.toLocaleString('vi-VN');
+  document.getElementById('cumulDays').textContent  = uniqueDays;
+  document.getElementById('cumulDateNote').textContent = `Dữ liệu tích luỹ tính đến ${ld}/${lm}/${ly}`;
+  document.getElementById('cumulBanner').classList.add('active');
 }
 
+/* ══════════════════════════════════════
+   Filter & search
+   ══════════════════════════════════════ */
 function applyFilter() {
-  const date   = document.getElementById('filterDate').value;   // "YYYY-MM-DD"
   const chuyen = document.getElementById('filterChuyen').value;
   const search = document.getElementById('searchInput').value.toLowerCase().trim();
 
   let rows = allData;
 
-  if (date) {
-    rows = rows.filter(r => {
-      const raw = getF(r, ['Ngày','ngay','Ngay','Ngay lam','Ngày làm','date','Date','ngayLam']);
-      return toISO(raw) === date;
-    });
+  // Date filter
+  if (dateMode === 'single') {
+    const date = document.getElementById('filterDate').value;
+    if (date) {
+      rows = rows.filter(r => {
+        const raw = getF(r, ['Ngày','ngay','Ngay','Ngay lam','Ngày làm','date','Date','ngayLam']);
+        return toISO(raw) === date;
+      });
+    }
+  } else {
+    const from = document.getElementById('filterDateFrom').value;
+    const to   = document.getElementById('filterDateTo').value;
+    if (from || to) {
+      rows = rows.filter(r => {
+        const d = toISO(getF(r, ['Ngày','ngay','Ngay','Ngay lam','Ngày làm','date','Date','ngayLam']));
+        if (!d) return false;
+        if (from && d < from) return false;
+        if (to   && d > to)   return false;
+        return true;
+      });
+    }
   }
 
   if (chuyen) {
@@ -657,32 +894,51 @@ function applyFilter() {
     });
   }
 
+  // Update summary sub-label
+  if (dateMode === 'range' && viewMode === 'grouped') {
+    document.getElementById('sSubTotal').textContent = 'người (tổng hợp)';
+  } else if (dateMode === 'range') {
+    document.getElementById('sSubTotal').textContent = 'bản ghi trong khoảng ngày';
+  } else {
+    document.getElementById('sSubTotal').textContent = 'bản ghi trong ngày';
+  }
+
   renderSummary(rows);
-  renderTable(rows);
+  if (dateMode === 'range' && viewMode === 'grouped') {
+    renderTableGrouped(rows);
+  } else {
+    renderTable(rows);
+  }
 }
 
 function clearFilter() {
   document.getElementById('filterChuyen').value = '';
   document.getElementById('searchInput').value  = '';
+  document.getElementById('filterDateFrom').value = '';
+  document.getElementById('filterDateTo').value   = '';
+  viewMode = 'detail';
+  updateGroupBtn();
+  switchMode('single');
   setDefaultDate();
   applyFilter();
 }
 
 function showAll() {
   document.getElementById('filterDate').value   = '';
+  document.getElementById('filterDateFrom').value = '';
+  document.getElementById('filterDateTo').value   = '';
   document.getElementById('filterChuyen').value = '';
   document.getElementById('searchInput').value  = '';
   applyFilter();
 }
 
 /* ══════════════════════════════════════
-   Helpers: get field with fallback keys
+   Helpers
    ══════════════════════════════════════ */
 function getF(row, keys) {
   for (const k of keys) {
     if (row[k] !== undefined && row[k] !== null && row[k] !== '') return row[k];
   }
-  // fallback: case-insensitive search
   const lkeys = keys.map(k => k.toLowerCase());
   for (const rk of Object.keys(row)) {
     if (lkeys.includes(rk.toLowerCase()) && row[rk] !== undefined && row[rk] !== null && row[rk] !== '') return row[rk];
@@ -690,7 +946,6 @@ function getF(row, keys) {
   return '';
 }
 function normalize(str) { return (str || '').trim().toLowerCase(); }
-
 function initials(name) {
   if (!name) return '?';
   const parts = name.trim().split(' ');
@@ -707,11 +962,13 @@ function renderSummary(rows) {
   const avg  = total ? Math.round(vals.reduce((a,b)=>a+b,0) / total) : 0;
   const max  = total ? Math.max(...vals) : 0;
   const min  = total ? Math.min(...vals) : 0;
-
   document.getElementById('sTotal').textContent = total || '—';
   document.getElementById('sAvg').textContent   = total ? avg  : '—';
   document.getElementById('sMax').textContent   = total ? max  : '—';
   document.getElementById('sMin').textContent   = total ? min  : '—';
+  // NS label changes in grouped mode
+  document.getElementById('sAvg').closest('.summary-card').querySelector('.s-lbl').textContent =
+    (dateMode === 'range' && viewMode === 'grouped') ? 'NS trung bình' : 'NS trung bình';
 }
 
 /* ══════════════════════════════════════
@@ -724,16 +981,30 @@ function setTableLoading() {
 }
 
 function renderTable(rows) {
-  document.getElementById('rowCountLabel').textContent = rows.length + ' bản ghi';
+  // Restore detail thead
+  document.getElementById('tableTitle').textContent = 'Danh sách công nhân';
+  document.getElementById('tableHead').innerHTML = `
+    <tr>
+      <th>#</th>
+      <th>Họ và tên</th>
+      <th>Chuyền</th>
+      <th>Mã hàng</th>
+      <th class="num">Số công đoạn</th>
+      <th class="num">Năng suất (sp/ng)</th>
+      <th>Ngày làm</th>
+    </tr>`;
 
+  document.getElementById('rowCountLabel').textContent = rows.length + ' bản ghi';
   if (!rows.length) {
     document.getElementById('tableBody').innerHTML =
       `<tr><td colspan="7"><div class="state-box"><div class="state-icon">🔍</div>Không có dữ liệu cho bộ lọc này</div></td></tr>`;
     return;
   }
 
-  /* Sort: by chuyen → name */
   const sorted = [...rows].sort((a, b) => {
+    const da = toISO(getF(a, ['Ngày','ngay','Ngay','date','Date'])) || '';
+    const db = toISO(getF(b, ['Ngày','ngay','Ngay','date','Date'])) || '';
+    if (da !== db) return da.localeCompare(db);
     const ca = getF(a, ['chuyen','Chuyen','Chuyền']) || '';
     const cb = getF(b, ['chuyen','Chuyen','Chuyền']) || '';
     if (ca !== cb) return ca.localeCompare(cb, 'vi');
@@ -746,17 +1017,16 @@ function renderTable(rows) {
 
   let html = '';
   sorted.forEach((r, i) => {
-    const ten     = getF(r, ['Họ và tên','ten','Ten','Họ tên','ho_ten','HoTen']) || '—';
-    const chuyen  = getF(r, ['Bộ phận','Bo phan','chuyen','Chuyen','Chuyền','chuyen_so']) || '—';
-    const maHang  = getF(r, ['Mã hàng','maHang','MaHang','ma_hang','maDonHang','mahang']) || '—';
-    const congDoan= getF(r, ['Số công đoạn','congDoan','CongDoan','Công đoạn','cong_doan','so_cong_doan']) || '—';
-    const nsRaw   = getF(r, ['Năng suất (sp/ngày)','nangSuat','NangSuat','Năng suất','nang_suat','ns','NS']);
-    const ns      = parseFloat(nsRaw) || 0;
-    const ngay    = getF(r, ['Ngày','ngay','Ngay','date','Date']) || '—';
+    const ten      = getF(r, ['Họ và tên','ten','Ten','Họ tên','ho_ten','HoTen']) || '—';
+    const chuyen   = getF(r, ['Bộ phận','Bo phan','chuyen','Chuyen','Chuyền','chuyen_so']) || '—';
+    const maHang   = getF(r, ['Mã hàng','maHang','MaHang','ma_hang','maDonHang','mahang']) || '—';
+    const congDoan = getF(r, ['Số công đoạn','congDoan','CongDoan','Công đoạn','cong_doan','so_cong_doan']) || '—';
+    const nsRaw    = getF(r, ['Năng suất (sp/ngày)','nangSuat','NangSuat','Năng suất','nang_suat','ns','NS']);
+    const ns       = parseFloat(nsRaw) || 0;
+    const ngay     = getF(r, ['Ngày','ngay','Ngay','date','Date']) || '—';
 
-    const colorKey = normalize(chuyen);
+    const colorKey   = normalize(chuyen);
     const badgeClass = chuyenColors[colorKey] !== undefined ? chuyenColors[colorKey] : '';
-
     let nsClass = 'ns-none';
     if (ns >= 300)      nsClass = 'ns-high';
     else if (ns >= 150) nsClass = 'ns-mid';
@@ -765,82 +1035,124 @@ function renderTable(rows) {
     html += `
       <tr>
         <td style="color:#bbb;font-size:12px">${i + 1}</td>
-        <td>
-          <div class="cell-name">
-            <div class="avatar">${initials(ten)}</div>
-            ${escHtml(ten)}
-          </div>
-        </td>
+        <td><div class="cell-name"><div class="avatar">${initials(ten)}</div>${escHtml(ten)}</div></td>
         <td><span class="badge-chuyen ${badgeClass}">${escHtml(chuyen)}</span></td>
         <td style="font-weight:600">${escHtml(maHang)}</td>
         <td class="num">${escHtml(String(congDoan))}</td>
-        <td class="num">
-          <span class="ns-pill ${nsClass}">${ns > 0 ? ns.toLocaleString('vi-VN') : '—'}</span>
-        </td>
+        <td class="num"><span class="ns-pill ${nsClass}">${ns > 0 ? ns.toLocaleString('vi-VN') : '—'}</span></td>
         <td style="color:#888;font-size:12px">${escHtml(ngay)}</td>
       </tr>`;
   });
-
   document.getElementById('tableBody').innerHTML = html;
 }
 
-function escHtml(s) {
-  return String(s)
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-}
+/* ══════════════════════════════════════
+   Grouped render – tổng hợp theo người + chuyền + mã hàng + công đoạn
+   ══════════════════════════════════════ */
+function renderTableGrouped(rows) {
+  // group by: tên + chuyền + mã hàng + tên công đoạn → cộng NS, đếm ngày
+  const map = {};
+  rows.forEach(r => {
+    const ten      = getF(r, ['Họ và tên','ten','Ten','Họ tên','ho_ten','HoTen']) || '—';
+    const chuyen   = getF(r, ['Bộ phận','Bo phan','chuyen','Chuyen','Chuyền','chuyen_so']) || '—';
+    const maHang   = getF(r, ['Mã hàng','maHang','MaHang','ma_hang','maDonHang','mahang']) || '—';
+    const congDoan = getF(r, ['Tên công đoạn','tenCongDoan','ten_cong_doan','Tên CĐ','Công đoạn','CongDoan','congDoan','cong_doan']) || '—';
+    const soCDRaw  = getF(r, ['Số công đoạn','soCongDoan','so_cong_doan','CongDoan','congDoan']) || '';
+    const soCD     = soCDRaw !== '' ? soCDRaw : '—';
+    const ns       = parseFloat(getF(r, ['Năng suất (sp/ngày)','nangSuat','NangSuat','Năng suất','nang_suat','ns','NS'])) || 0;
+    const ngay     = toISO(getF(r, ['Ngày','ngay','Ngay','Ngay lam','Ngày làm','date','Date','ngayLam'])) || '';
 
-</script>
-
-<!--
-════════════════════════════════════════════════════════════════
-  HƯỚNG DẪN: Thêm doGet vào Google Apps Script
-════════════════════════════════════════════════════════════════
-
-Mở Google Apps Script của project hiện tại (script.google.com),
-thêm hàm sau vào file Code.gs:
-
-──────────────────────────────────────────
-function doGet(e) {
-  var action    = e.parameter.action;
-  var sheetName = e.parameter.sheet || 'NangSuat';
-
-  if (action === 'getData') {
-    var ss   = SpreadsheetApp.getActiveSpreadsheet();
-    var sheet = ss.getSheetByName(sheetName);
-    if (!sheet) {
-      return ContentService
-        .createTextOutput(JSON.stringify({ error: 'Sheet not found: ' + sheetName }))
-        .setMimeType(ContentService.MimeType.JSON);
+    const key = `${ten}||${normalize(chuyen)}||${maHang}||${congDoan}`;
+    if (!map[key]) {
+      map[key] = { ten, chuyen, maHang, congDoan, soCD, totalNS: 0, days: new Set() };
     }
-    var data    = sheet.getDataRange().getValues();
-    var headers = data[0];
-    var rows    = data.slice(1)
-      .filter(function(row){ return row.some(function(c){ return c !== ''; }); })
-      .map(function(row){
-        var obj = {};
-        headers.forEach(function(h, i){ obj[h] = row[i]; });
-        return obj;
-      });
+    map[key].totalNS += ns;
+    if (ngay) map[key].days.add(ngay);
+  });
 
-    return ContentService
-      .createTextOutput(JSON.stringify({ data: rows }))
-      .setMimeType(ContentService.MimeType.JSON);
+  const grouped = Object.values(map);
+
+  // update title + thead (8 cols now)
+  document.getElementById('tableTitle').textContent = 'Tổng hợp theo công đoạn';
+  document.getElementById('tableHead').innerHTML = `
+    <tr>
+      <th>#</th>
+      <th>Họ và tên</th>
+      <th>Chuyền</th>
+      <th>Mã hàng</th>
+      <th class="num">Số CĐ</th>
+      <th>Tên công đoạn</th>
+      <th class="num">Số ngày làm</th>
+      <th class="num">Tổng NS (sp)</th>
+      <th class="num">TB/ngày (sp)</th>
+    </tr>`;
+
+  document.getElementById('rowCountLabel').textContent = grouped.length + ' dòng';
+
+  if (!grouped.length) {
+    document.getElementById('tableBody').innerHTML =
+      `<tr><td colspan="9"><div class="state-box"><div class="state-icon">🔍</div>Không có dữ liệu cho bộ lọc này</div></td></tr>`;
+    return;
   }
 
-  return ContentService
-    .createTextOutput(JSON.stringify({ status: 'ok' }))
-    .setMimeType(ContentService.MimeType.JSON);
+  // sort: chuyền → tên → mã hàng → công đoạn
+  grouped.sort((a, b) => {
+    const cc = normalize(a.chuyen).localeCompare(normalize(b.chuyen), 'vi');
+    if (cc !== 0) return cc;
+    const nc = a.ten.localeCompare(b.ten, 'vi');
+    if (nc !== 0) return nc;
+    const mc = a.maHang.localeCompare(b.maHang, 'vi');
+    if (mc !== 0) return mc;
+    return a.congDoan.localeCompare(b.congDoan, 'vi');
+  });
+
+  const chuyenColors = { 'chuyền 1':'', 'chuyền 2':'c2', 'chuyền 3':'c3', 'chuyền 4':'c4', 'chuyền 5':'c5' };
+
+  let html = '';
+  let prevKey = '';  // để gộp hiển thị avatar/tên khi cùng người
+  grouped.forEach((g, i) => {
+    const colorKey   = normalize(g.chuyen);
+    const badgeClass = chuyenColors[colorKey] !== undefined ? chuyenColors[colorKey] : '';
+    const dayCount   = g.days.size;
+    const avg        = dayCount ? Math.round(g.totalNS / dayCount) : 0;
+    const personKey  = `${g.ten}||${normalize(g.chuyen)}`;
+    const sameAsPrev = (personKey === prevKey);
+    prevKey = personKey;
+
+    let nsClass = 'ns-none';
+    if (g.totalNS >= 1500)     nsClass = 'ns-high';
+    else if (g.totalNS >= 500) nsClass = 'ns-mid';
+    else if (g.totalNS > 0)    nsClass = 'ns-low';
+
+    // Nếu cùng người & chuyền với dòng trên → ẩn avatar/tên/chuyền để dễ đọc
+    const nameTd = sameAsPrev
+      ? `<td style="color:#bbb;padding-left:46px;font-size:12px">↳</td>`
+      : `<td><div class="cell-name"><div class="avatar">${initials(g.ten)}</div>${escHtml(g.ten)}</div></td>`;
+    const chuyenTd = sameAsPrev
+      ? `<td></td>`
+      : `<td><span class="badge-chuyen ${badgeClass}">${escHtml(g.chuyen)}</span></td>`;
+
+    html += `
+      <tr>
+        <td style="color:#bbb;font-size:12px">${i + 1}</td>
+        ${nameTd}
+        ${chuyenTd}
+        <td style="font-weight:600">${escHtml(g.maHang)}</td>
+        <td class="num" style="color:#888;font-size:12px">${escHtml(String(g.soCD))}</td>
+        <td style="color:#555;font-size:12px">${escHtml(g.congDoan)}</td>
+        <td class="num" style="color:#aaa;font-size:12px">${dayCount}</td>
+        <td class="num"><span class="ns-pill ${nsClass}">${g.totalNS > 0 ? g.totalNS.toLocaleString('vi-VN') : '—'}</span></td>
+        <td class="num" style="color:#888;font-size:12px">${avg > 0 ? avg.toLocaleString('vi-VN') : '—'}</td>
+      </tr>`;
+  });
+  document.getElementById('tableBody').innerHTML = html;
 }
-──────────────────────────────────────────
 
-Sau đó:
-1. Deploy → New deployment → Web app
-2. Execute as: Me
-3. Who has access: Anyone
-4. Copy URL → dán vào ô "Web App URL" trong dashboard
 
-════════════════════════════════════════════════════════════════
--->
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+                  .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+</script>
 </body>
 </html>
