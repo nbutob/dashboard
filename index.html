@@ -420,7 +420,7 @@
   .badge-chuyen.c3 { background: #fff3e0; color: #e65100; }
   .badge-chuyen.c4 { background: #fce4ec; color: #880e4f; }
   .badge-chuyen.c5 { background: #f3e5f5; color: #4a148c; }
-
+  .badge-chuyen.tv { background: #ede7f6; color: #311b92; }
   .ns-pill {
     display: inline-block;
     padding: 3px 10px;
@@ -552,6 +552,7 @@
             <option>Chuyền 3</option>
             <option>Chuyền 4</option>
             <option>Chuyền 5</option>
+            <option>TV</option>
           </select>
         </div>
         <button class="btn btn-outline" onclick="clearFilter()">✕ Xoá lọc</button>
@@ -1013,7 +1014,14 @@ function renderTable(rows) {
     return na.localeCompare(nb, 'vi');
   });
 
-  const chuyenColors = { 'chuyền 1':'', 'chuyền 2':'c2', 'chuyền 3':'c3', 'chuyền 4':'c4', 'chuyền 5':'c5' };
+  const chuyenColors = {
+  'chuyền 1': '',
+  'chuyền 2': 'c2',
+  'chuyền 3': 'c3',
+  'chuyền 4': 'c4',
+  'chuyền 5': 'c5',
+  'tv': 'tv'
+};
 
   let html = '';
   sorted.forEach((r, i) => {
@@ -1106,7 +1114,14 @@ function renderTableGrouped(rows) {
     return a.congDoan.localeCompare(b.congDoan, 'vi');
   });
 
-  const chuyenColors = { 'chuyền 1':'', 'chuyền 2':'c2', 'chuyền 3':'c3', 'chuyền 4':'c4', 'chuyền 5':'c5' };
+  const chuyenColors = {
+  'chuyền 1': '',
+  'chuyền 2': 'c2',
+  'chuyền 3': 'c3',
+  'chuyền 4': 'c4',
+  'chuyền 5': 'c5',
+  'tv': 'tv'
+};
 
   let html = '';
   let prevKey = '';  // để gộp hiển thị avatar/tên khi cùng người
